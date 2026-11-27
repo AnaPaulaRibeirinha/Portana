@@ -30,7 +30,7 @@ FastAPI ── autenticação ── caso de uso de acesso
           (persistência)   (monitoramento)    (alertas)
 ```
 
-O primeiro corte pode usar SQLite (`DATABASE_URL=sqlite:///./portana.db`). A aplicação não deve depender de SQLite: o contrato de persistência permite trocar para PostgreSQL por configuração.
+O banco oficial do projeto é PostgreSQL. Para subir uma instância local, use o serviço `postgres` do [docker-compose.yml](./docker-compose.yml) e configure `DATABASE_URL=postgresql+psycopg://portana:portana@localhost:5432/portana`. Os testes unitários usam SQLite em memória para serem rápidos e isolados.
 
 ## Executar localmente
 
@@ -39,6 +39,9 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
+cd ..
+docker compose up -d postgres
+cd backend
 uvicorn app.main:app --reload
 ```
 
@@ -46,8 +49,8 @@ Documentação da API: <http://localhost:8000/docs>.
 
 ## Escopo do MVP backend
 
-1. Autenticação JWT e perfis `ADMIN`, `PORTEIRO` e `MORADOR`.
-2. Cadastro e ativação/bloqueio de usuários, moradores e unidades.
+1. Autenticação JWT e perfis `ADMIN`, `PORTEIRO` e `MORADOR` (`POST /api/v1/auth/login`).
+2. Cadastro de usuários protegido por perfil (`POST /api/v1/users`) e consulta do perfil atual (`GET /api/v1/users/me`).
 3. Regras de horário por dia da semana e ponto de acesso.
 4. Simulação de passagem com registro imutável do resultado.
 5. Evento `access_attempt.created` para o painel ao vivo.
